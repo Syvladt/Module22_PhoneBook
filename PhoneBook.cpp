@@ -52,6 +52,10 @@ std::string addRecord(std::map<std::string, std::string>& phonebook)
 		}
 	} while (fail);
 	phonebook.insert({ name, phone });
+	// Так как оба элемента - строки, то их можно поменять местами
+	// И тогда в поле name будут и телефоны.
+	// Избыточно - ДА, но работает.
+	phonebook.insert({ phone, name });
 
 	return message;
 }
@@ -79,6 +83,7 @@ std::string generateRecord(std::map<std::string, std::string>& phonebook)
 		for (int j = 0; j < 12; ++j)
 			phone += char(std::rand() % 10 + 48);
 		phonebook.insert({ name, phone });
+		phonebook.insert({ phone, name });
 	}
 	message = "Generation was successfully.";
 	return message;
@@ -141,25 +146,12 @@ int main()
 		}
 		else if (ch == 61) // F3
 		{
-			// Ищем фамилию по номеру телефона. Есть несколько способов.
-			// 1. Просматриваем последовательно весь(всю) map и пока не наткнёмся на искомый телефон
-			// 2. Можно создать второй(вторую) map, в которой ключом будет телефон, т.е.
-			//    вставляем элементы в koobenohp.insert({phone, name}) и ищем фамилию по номеру телефона.
-			// Возможно ещё есть варианты, о которых я не знаю.
-			// Реализую первый вариант.
-			// Особого смысла делать проверку ввода нет, т.к. пользователь может ввести как фамилию из map
-			// так и любую другую.
+			// Ищем фамилию по номеру телефона. как я понял в multimap тоже
+			// избыточная информация.
 			std::cout << "\nEnter phone number for search: ";
 			std::cin >> message;
-			success = false;
-			for (std::map<std::string, std::string>::iterator it = phonebook.begin(); it != phonebook.end() && !success; ++it)
-				if (it->second == message)
-				{
-					success = true;
-					temp = it->first;
-				}
-			if (success)
-				message = "For phone number " + message + " found last name: " + temp;
+			if (phonebook.count(message) > 0)
+				message = "For phone number " + message + " found last name: " + phonebook.at(message);
 			else
 				message = "For phone number " + message + " last name not found.";
 		}
